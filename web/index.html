@@ -46,6 +46,19 @@
                 </div>
             </section>
 
+            <section id="historyPanel" class="history-panel" aria-label="历史对话" hidden>
+                <div class="history-head">
+                    <span id="historyTitle" class="history-title">历史</span>
+                    <button id="toggleImport" class="button ghost small" type="button">导入记录</button>
+                    <button id="clearHistory" class="button ghost small" type="button">清空</button>
+                </div>
+                <div id="historyList" class="history-list"></div>
+                <div id="importBox" class="import-box" hidden>
+                    <textarea id="importText" rows="5" placeholder="对方：在吗&#10;我：在的&#10;对方：晚上一起吃饭吗"></textarea>
+                    <button id="importConfirm" class="button secondary" type="button">导入历史</button>
+                </div>
+            </section>
+
             <p id="status" class="status" role="status" aria-live="polite"></p>
 
             <section id="results" class="results" aria-label="回复建议"></section>

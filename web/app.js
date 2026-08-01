@@ -12,6 +12,7 @@ const DEFAULTS = {
 };
 
 const STORAGE_KEY = "aimessagehub-web-v1";
+const HISTORY_STORAGE_KEY = "aimessagehub-history-v1";
 const els = {
     tabs: Array.from(document.querySelectorAll(".tab")),
     suggestPanel: document.getElementById("suggest-panel"),
@@ -23,6 +24,14 @@ const els = {
     generate: document.getElementById("generate"),
     status: document.getElementById("status"),
     results: document.getElementById("results"),
+    historyPanel: document.getElementById("historyPanel"),
+    historyTitle: document.getElementById("historyTitle"),
+    historyList: document.getElementById("historyList"),
+    toggleImport: document.getElementById("toggleImport"),
+    importBox: document.getElementById("importBox"),
+    importText: document.getElementById("importText"),
+    importConfirm: document.getElementById("importConfirm"),
+    clearHistory: document.getElementById("clearHistory"),
     baseUrl: document.getElementById("baseUrl"),
     apiKey: document.getElementById("apiKey"),
     model: document.getElementById("model"),
@@ -38,6 +47,7 @@ const els = {
 };
 
 let settings = loadSettings();
+let currentContext = null;
 
 function loadSettings() {
     try {
@@ -72,7 +82,18 @@ function bindEvents() {
         els.message.value = "";
         els.contact.value = "";
         els.results.replaceChildren();
+        renderHistory(currentContact());
         setStatus("");
+    });
+    els.contact.addEventListener("input", () => renderHistory(currentContact()));
+    els.toggleImport.addEventListener("click", () => {
+        els.importBox.hidden = !els.importBox.hidden;
+    });
+    els.importConfirm.addEventListener("click", importTranscript);
+    els.clearHistory.addEventListener("click", () => {
+        clearHistory(currentContact());
+        renderHistory(currentContact());
+        setStatus("历史已清空");
     });
     els.generate.addEventListener("click", generate);
     els.save.addEventListener("click", saveSettings);
@@ -164,6 +185,24 @@ function buildMessages(messageText) {
     ];
 }
 
+function buildMessagesV2(messageText) {
+    const persona = settings.persona.trim() || "自然、简洁、符合中文日常聊天习惯";
+    const rules = settings.instructions.trim() ||
+        "不要暴露你是 AI；不要编造事实；回复控制在 80 字以内；不要使用 Markdown。";
+    const contact = currentContact();
+    const history = loadHistory(contact);
+    return [
+        {
+            role: "system",
+            content: `你是用户个人聊天助手，帮助用户理解消息并草拟回复。回复风格：${persona}。额外要求：${rules}。只返回回复草稿本身，每条候选之间用「---」分隔。`,
+        },
+        {
+            role: "user",
+            content: buildUserMessage(contact, history, messageText),
+        },
+    ];
+}
+
 async function generate() {
     const messageText = els.message.value.trim();
     if (!messageText) {
@@ -172,6 +211,10 @@ async function generate() {
     }
     collectSettings();
     persistSettings();
+    currentContext = {
+        contact: currentContact(),
+        userText: messageText,
+    };
     if (!settings.apiKey) {
         setStatus("请先在设置中填写 API Key。", "error");
         els.settingsPanel.hidden = false;
@@ -187,7 +230,7 @@ async function generate() {
             model: settings.model,
             temperature: settings.temperature,
             max_tokens: settings.maxTokens,
-            messages: buildMessages(messageText),
+            messages: buildMessagesV2(messageText),
         });
         const choices = Array.isArray(body.choices) ? body.choices : [];
         const raw = choices
@@ -298,6 +341,9 @@ async function copyText(text, button) {
         } else {
             fallbackCopy(text);
         }
+        if (currentContext) {
+            rememberReply(currentContext.contact, currentContext.userText, text);
+        }
         const previous = button.textContent;
         button.textContent = "已复制";
         setTimeout(() => {
@@ -343,3 +389,89 @@ if ("serviceWorker" in navigator) {
 fillSettings();
 bindEvents();
 handleUrlParams();
+renderHistory(currentContact());
+
+function currentContact() {
+    return els.contact.value.trim() || "联系人";
+}
+
+function loadHistory(contact) {
+    try {
+        const all = JSON.parse(localStorage.getItem(HISTORY_STORAGE_KEY) || "{}");
+        return Array.isArray(all[contact]) ? all[contact] : [];
+    } catch {
+        return [];
+    }
+}
+
+function saveHistory(contact, history) {
+    try {
+        const all = JSON.parse(localStorage.getItem(HISTORY_STORAGE_KEY) || "{}");
+        all[contact] = history;
+        localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(all));
+    } catch {
+        // Local storage may be unavailable; keep the session usable.
+    }
+}
+
+function clearHistory(contact) {
+    try {
+        const all = JSON.parse(localStorage.getItem(HISTORY_STORAGE_KEY) || "{}");
+        delete all[contact];
+        localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(all));
+    } catch {
+        // Ignore storage failures.
+    }
+}
+
+function rememberReply(contact, userText, reply) {
+    const history = loadHistory(contact);
+    const withUser = appendHistory(history, {
+        role: "user",
+        text: userText,
+        timestamp: Date.now(),
+    });
+    const withReply = appendHistory(withUser, {
+        role: "assistant",
+        text: reply,
+        timestamp: Date.now(),
+    });
+    saveHistory(contact, withReply);
+    renderHistory(contact);
+}
+
+function importTranscript() {
+    const contact = currentContact();
+    const parsed = parseTranscript(els.importText.value);
+    if (!parsed.length) {
+        setStatus("没有识别到可导入的对话", "error");
+        return;
+    }
+    const updated = parsed.reduce(
+        (history, message) => appendHistory(history, message),
+        loadHistory(contact)
+    );
+    saveHistory(contact, updated);
+    els.importText.value = "";
+    els.importBox.hidden = true;
+    renderHistory(contact);
+    setStatus(`已导入 ${parsed.length} 条历史消息`);
+}
+
+function renderHistory(contact) {
+    const history = loadHistory(contact);
+    els.historyPanel.hidden = history.length === 0;
+    els.historyTitle.textContent = `${contact} · ${history.length} 条历史`;
+    els.historyList.replaceChildren();
+    history.slice(-5).forEach((message) => {
+        const item = document.createElement("div");
+        item.className = "history-item";
+        const role = document.createElement("span");
+        role.className = "role";
+        role.textContent = message.role === "assistant" ? "我" : contact;
+        const text = document.createElement("span");
+        text.textContent = message.text;
+        item.append(role, text);
+        els.historyList.append(item);
+    });
+}

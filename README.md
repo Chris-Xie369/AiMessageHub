@@ -37,6 +37,8 @@ iOS 受系统沙盒限制，无法像 Android 一样读取微信内部聊天并�
 
 PWA 支持 OpenAI、DeepSeek 等 OpenAI 兼容服务；设置页提供 OpenAI/DeepSeek 预设，DeepSeek 会自动填入 `https://api.deepseek.com` 和 `deepseek-chat`。
 
+Web/PWA 还支持本地历史对话：按联系人保存最近 20 条消息，生成建议时自动带入上下文，也可粘贴“我/对方”格式的聊天记录导入。
+
 开发流程使用 TDD：先审查，再写失败测试，做最小修复，最后运行完整自测；具体命令见 [docs/tdd.md](docs/tdd.md)。
 
 ## iOS 快速开始

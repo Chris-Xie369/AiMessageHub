@@ -1,10 +1,11 @@
 "use strict";
 
-const CACHE = "aimessagehub-web-v5";
+const CACHE = "aimessagehub-web-v6";
 const ASSETS = [
     "./",
     "./index.html",
     "./styles.css",
+    "./core.js",
     "./app.js",
     "./icon.svg",
     "./manifest.webmanifest",

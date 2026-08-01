@@ -2,6 +2,6 @@
     "name": "ai-message-hub-web",
     "private": true,
     "scripts": {
-        "test": "node --test tests/core.test.js tests/chatFunction.test.js"
+        "test": "node --test tests/core.test.js tests/chatFunction.test.js tests/history.test.js"
     }
 }

@@ -31,6 +31,8 @@ const els = {
     persona: document.getElementById("persona"),
     instructions: document.getElementById("instructions"),
     useProxy: document.getElementById("useProxy"),
+    presetOpenAI: document.getElementById("presetOpenAI"),
+    presetDeepSeek: document.getElementById("presetDeepSeek"),
     save: document.getElementById("save"),
     saveStatus: document.getElementById("saveStatus"),
 };
@@ -74,6 +76,8 @@ function bindEvents() {
     });
     els.generate.addEventListener("click", generate);
     els.save.addEventListener("click", saveSettings);
+    els.presetOpenAI.addEventListener("click", () => applyPreset("openai"));
+    els.presetDeepSeek.addEventListener("click", () => applyPreset("deepseek"));
 }
 
 function readClipboard() {
@@ -125,6 +129,21 @@ function saveSettings() {
     collectSettings();
     persistSettings();
     els.saveStatus.textContent = "设置已保存";
+    els.saveStatus.className = "status success";
+}
+
+function applyPreset(name) {
+    collectSettings();
+    if (name === "deepseek") {
+        settings.baseUrl = "https://api.deepseek.com";
+        settings.model = "deepseek-chat";
+    } else {
+        settings.baseUrl = "https://api.openai.com/v1";
+        settings.model = "gpt-4o-mini";
+    }
+    fillSettings();
+    persistSettings();
+    els.saveStatus.textContent = name === "deepseek" ? "DeepSeek 预设已应用" : "OpenAI 预设已应用";
     els.saveStatus.className = "status success";
 }
 
@@ -202,22 +221,6 @@ async function requestChatCompletion(payload) {
 }
 
 async function proxyChatCompletion(payload) {
-    const proxyUrl = new URL("/api/chat/completions", window.location.origin).toString();
-    const response = await fetch(proxyUrl, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + settings.apiKey,
-        },
-        body: JSON.stringify(payload),
-    });
-    if (response.status === 404) {
-        return functionChatCompletion(payload);
-    }
-    return readProxyResponse(response);
-}
-
-async function functionChatCompletion(payload) {
     const functionUrl = new URL("/.netlify/functions/chat", window.location.origin).toString();
     const response = await fetch(functionUrl, {
         method: "POST",

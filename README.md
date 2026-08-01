@@ -35,6 +35,8 @@ iOS 受系统沙盒限制，无法像 Android 一样读取微信内部聊天并�
 
 也支持 Netlify：仓库根目录已带 `netlify.toml`，在 Netlify 导入仓库后设置 Publish directory 为 `web`，Build command 留空，即可自动部署到 HTTPS。
 
+PWA 支持 OpenAI、DeepSeek 等 OpenAI 兼容服务；设置页提供 OpenAI/DeepSeek 预设，DeepSeek 会自动填入 `https://api.deepseek.com` 和 `deepseek-chat`。
+
 ## iOS 快速开始
 
 使用 [XcodeGen](https://github.com/yonaskolb/XcodeGen) 生成工程：

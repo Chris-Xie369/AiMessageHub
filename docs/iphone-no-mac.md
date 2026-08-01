@@ -30,13 +30,13 @@ https://你的域名/index.html?text=<剪贴板>&auto=1
 
 ### Failed to fetch 怎么处理
 
-这是浏览器 CORS 问题：OpenAI 官方 API 不允许网页直接跨域请求。仓库已带 `netlify/functions/chat.js`，用 Netlify Function 在服务端转发请求。
+这是浏览器 CORS 问题：OpenAI/DeepSeek 等 API 不允许网页直接跨域请求。仓库已带 `netlify/functions/chat.js`，用 Netlify Function 在服务端转发请求，并支持任意 OpenAI 兼容 Base URL。
 
 修复后请确认：
 
-- `web/_redirects` 会把 `/api/chat/completions` 代理到 OpenAI，因此重新拖 `web` 文件夹也能生效。
-- Netlify 使用 Git 导入时，`netlify/functions/chat.js` 会作为后备转发。
+- Netlify 使用 Git 导入，确保 `netlify/functions/chat.js` 被部署。
 - 设置页“通过 Netlify Function 转发请求”保持勾选。
+- 使用 DeepSeek 时，在设置页点“DeepSeek”预设，或手动把 Base URL 填为 `https://api.deepseek.com`、模型填为 `deepseek-chat`。
 - 保存设置后重新点“生成建议”。
 
 ## 方案二：纯快捷指令（不依赖本项目部署）

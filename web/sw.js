@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE = "aimessagehub-web-v2";
+const CACHE = "aimessagehub-web-v3";
 const ASSETS = [
     "./",
     "./index.html",

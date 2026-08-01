@@ -17,8 +17,8 @@ OpenAI 官方 API 不允许浏览器跨域直连，页面直接请求会触发 C
 
 仓库已包含 `netlify/functions/chat.js`，这是一个 Netlify Function，会在服务端转发 OpenAI 请求，从而绕开浏览器 CORS。发布时请确认：
 
-- 使用 Git 导入 Netlify，而不是只部署静态文件。
-- `netlify.toml` 保留 `functions = "netlify/functions"`。
+- `web/_redirects` 已把 `/api/chat/completions` 代理到 OpenAI，拖 `web` 文件夹部署也有效。
+- 使用 Git 导入时，`netlify/functions/chat.js` 会作为后备转发；`netlify.toml` 保留 `functions = "netlify/functions"`。
 - 设置页勾选“通过 Netlify Function 转发请求”。
 
 如果部署在非 Netlify 平台且没有该 Function，需要改用支持 CORS 的 OpenAI 兼容服务，或取消勾选并自行配置可用的代理。

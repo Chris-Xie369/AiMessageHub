@@ -202,8 +202,24 @@ async function requestChatCompletion(payload) {
 }
 
 async function proxyChatCompletion(payload) {
-    const proxyUrl = new URL("/.netlify/functions/chat", window.location.origin).toString();
+    const proxyUrl = new URL("/api/chat/completions", window.location.origin).toString();
     const response = await fetch(proxyUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + settings.apiKey,
+        },
+        body: JSON.stringify(payload),
+    });
+    if (response.status === 404) {
+        return functionChatCompletion(payload);
+    }
+    return readProxyResponse(response);
+}
+
+async function functionChatCompletion(payload) {
+    const functionUrl = new URL("/.netlify/functions/chat", window.location.origin).toString();
+    const response = await fetch(functionUrl, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -214,15 +230,19 @@ async function proxyChatCompletion(payload) {
             payload,
         }),
     });
+    if (response.status === 404) {
+        throw new Error("PROXY_NOT_FOUND");
+    }
+    return readProxyResponse(response);
+}
+
+async function readProxyResponse(response) {
     const text = await response.text();
     let body = {};
     try {
         body = text ? JSON.parse(text) : {};
     } catch {
         body = {};
-    }
-    if (response.status === 404) {
-        throw new Error("PROXY_NOT_FOUND");
     }
     if (!response.ok) {
         const detail = body && body.error && body.error.message

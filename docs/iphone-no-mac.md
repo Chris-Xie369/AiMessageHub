@@ -34,11 +34,10 @@ https://你的域名/index.html?text=<剪贴板>&auto=1
 
 修复后请确认：
 
-- Netlify 使用 Git 导入，而不是只拖静态文件。
+- `web/_redirects` 会把 `/api/chat/completions` 代理到 OpenAI，因此重新拖 `web` 文件夹也能生效。
+- Netlify 使用 Git 导入时，`netlify/functions/chat.js` 会作为后备转发。
 - 设置页“通过 Netlify Function 转发请求”保持勾选。
 - 保存设置后重新点“生成建议”。
-
-如果你用的是 Netlify Drop，请改回 Git 导入，因为 Function 需要随仓库一起部署。
 
 ## 方案二：纯快捷指令（不依赖本项目部署）
 

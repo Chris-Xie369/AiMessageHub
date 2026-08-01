@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE = "aimessagehub-web-v1";
+const CACHE = "aimessagehub-web-v2";
 const ASSETS = [
     "./",
     "./index.html",
@@ -45,4 +45,3 @@ self.addEventListener("fetch", (event) => {
         )
     );
 });
-

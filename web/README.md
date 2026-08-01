@@ -22,6 +22,8 @@ OpenAI 官方 API 不允许浏览器跨域直连，页面直接请求会触发 C
 
 DeepSeek 用户：在设置页点“DeepSeek”预设，Base URL 会自动设为 `https://api.deepseek.com`，模型自动设为 `deepseek-chat`，再填入 DeepSeek API Key 即可。
 
+Base URL 只需要填到域名或 `/v1`，例如 `https://api.deepseek.com` 或 `https://api.deepseek.com/v1`；即使误填了完整 `/chat/completions` 地址，程序也会自动修正，不再重复追加。
+
 ## Shortcuts 自动化
 
 可以创建一个“快捷指令”：

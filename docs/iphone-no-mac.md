@@ -39,6 +39,8 @@ https://你的域名/index.html?text=<剪贴板>&auto=1
 - 使用 DeepSeek 时，在设置页点“DeepSeek”预设，或手动把 Base URL 填为 `https://api.deepseek.com`、模型填为 `deepseek-chat`。
 - 保存设置后重新点“生成建议”。
 
+如果出现 `HTTP 405: Method Not Allowed`，通常是 Base URL 被填成了完整 `/chat/completions` 地址导致路径重复。现在程序会自动修正，请把 Base URL 填为 `https://api.deepseek.com` 或 `https://api.deepseek.com/v1` 后再试。
+
 ## 方案二：纯快捷指令（不依赖本项目部署）
 
 即使完全不构建 App，也可以在“快捷指令”里手动搭一个 AI 回复器：

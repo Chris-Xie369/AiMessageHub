@@ -257,7 +257,7 @@ async function readProxyResponse(response) {
 }
 
 async function directChatCompletion(payload) {
-    const response = await fetch(settings.baseUrl.replace(/\/+$/, "") + "/chat/completions", {
+    const response = await fetch(chatEndpoint(settings.baseUrl), {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -271,6 +271,16 @@ async function directChatCompletion(payload) {
             throw new Error(`HTTP ${response.status}: ${detail}`);
         }
         return body;
+}
+
+function chatEndpoint(baseUrl) {
+    const normalized = String(baseUrl || "https://api.openai.com/v1")
+        .trim()
+        .replace(/\/+$/, "");
+    if (/\/chat\/completions$/i.test(normalized)) {
+        return normalized;
+    }
+    return normalized + "/chat/completions";
 }
 
 function parseVariants(raw) {

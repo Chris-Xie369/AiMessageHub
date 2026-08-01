@@ -24,8 +24,7 @@ exports.handler = async (event) => {
         };
     }
 
-    const endpoint = String(baseUrl || "https://api.openai.com/v1")
-        .replace(/\/+$/, "") + "/chat/completions";
+    const endpoint = buildEndpoint(baseUrl);
 
     try {
         const upstream = await fetch(endpoint, {
@@ -56,3 +55,12 @@ exports.handler = async (event) => {
     }
 };
 
+function buildEndpoint(baseUrl) {
+    const normalized = String(baseUrl || "https://api.openai.com/v1")
+        .trim()
+        .replace(/\/+$/, "");
+    if (/\/chat\/completions$/i.test(normalized)) {
+        return normalized;
+    }
+    return normalized + "/chat/completions";
+}

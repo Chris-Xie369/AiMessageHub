@@ -9,6 +9,8 @@
 
 仓库已包含 [netlify.toml](../netlify.toml)。在 Netlify 导入该仓库后，把 Publish directory 设为 `web`，Build command 留空即可。
 
+想立刻上线而不等待 GitHub：打开 [Netlify Drop](https://app.netlify.com/drop)，把本文件夹直接拖进去即可。
+
 ## Shortcuts 自动化
 
 可以创建一个“快捷指令”：

@@ -19,6 +19,8 @@ https://你的域名/index.html?text=<剪贴板>&auto=1
 
 ### 用 Netlify 部署
 
+临时最快：打开 [Netlify Drop](https://app.netlify.com/drop)，把本仓库的 `web/` 文件夹直接拖进去，Netlify 会立即生成 HTTPS 地址，不需要 GitHub。
+
 1. 登录 [Netlify](https://www.netlify.com)，选择“Add new site → Import an existing project”。
 2. 选择 GitHub，并授权 Netlify 访问 `AiMessageHub` 仓库。
 3. Build command 留空，Publish directory 填 `web`。

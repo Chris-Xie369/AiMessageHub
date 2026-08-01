@@ -1,0 +1,20 @@
+{
+    "name": "AI 消息助手",
+    "short_name": "AI 助手",
+    "description": "粘贴聊天内容，生成可直接发送的 AI 回复建议。",
+    "lang": "zh-CN",
+    "start_url": "./index.html",
+    "scope": "./",
+    "display": "standalone",
+    "background_color": "#f3f5f7",
+    "theme_color": "#0e7c6b",
+    "icons": [
+        {
+            "src": "./icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any"
+        }
+    ]
+}
+

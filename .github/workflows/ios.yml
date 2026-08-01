@@ -1,0 +1,36 @@
+name: iOS CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate Xcode project
+        working-directory: ios
+        run: xcodegen generate
+      - name: Build for simulator
+        working-directory: ios
+        run: |
+          xcodebuild \
+            -project AiMessageHub.xcodeproj \
+            -scheme AiMessageHub \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+      - name: Run unit tests
+        working-directory: ios
+        run: |
+          xcodebuild \
+            -project AiMessageHub.xcodeproj \
+            -scheme AiMessageHub \
+            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            CODE_SIGNING_ALLOWED=NO \
+            test
+

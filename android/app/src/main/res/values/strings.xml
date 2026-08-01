@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">AI 消息中枢</string>
+    <string name="notification_service_label">消息监听服务</string>
+    <string name="accessibility_service_label">AI 消息中枢无障碍服务</string>
+    <string name="bubble_service_label">建议悬浮窗</string>
+</resources>
+

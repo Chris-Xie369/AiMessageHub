@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#0e7c6b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="AI 消息助手">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" href="./icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="./icon.svg">
+    <link rel="stylesheet" href="./styles.css">
+    <title>AI 消息助手</title>
+</head>
+<body>
+    <div class="shell">
+        <header class="app-header">
+            <div class="brand">
+                <img src="./icon.svg" alt="" class="brand-icon">
+                <div>
+                    <h1>AI 消息助手</h1>
+                    <p>粘贴聊天内容，生成可直接发送的回复</p>
+                </div>
+            </div>
+            <nav class="tabs" aria-label="页面切换">
+                <button class="tab is-active" data-tab="suggest" type="button">建议</button>
+                <button class="tab" data-tab="settings" type="button">设置</button>
+            </nav>
+        </header>
+
+        <main id="suggest-panel" class="panel">
+            <section class="composer" aria-label="消息输入">
+                <label class="field">
+                    <span>消息文本</span>
+                    <textarea id="message" rows="7" placeholder="粘贴对方消息或聊天内容"></textarea>
+                </label>
+                <label class="field">
+                    <span>联系人</span>
+                    <input id="contact" type="text" placeholder="例如：Alice" autocomplete="off">
+                </label>
+                <div class="actions">
+                    <button id="paste" class="button secondary" type="button">读取剪贴板</button>
+                    <button id="clear" class="button ghost" type="button">清空</button>
+                    <button id="generate" class="button primary" type="button">生成建议</button>
+                </div>
+            </section>
+
+            <p id="status" class="status" role="status" aria-live="polite"></p>
+
+            <section id="results" class="results" aria-label="回复建议"></section>
+        </main>
+
+        <main id="settings-panel" class="panel" hidden>
+            <section class="settings" aria-label="AI 设置">
+                <label class="field">
+                    <span>Base URL</span>
+                    <input id="baseUrl" type="url" value="https://api.openai.com/v1" autocomplete="off">
+                </label>
+                <label class="field">
+                    <span>API Key</span>
+                    <input id="apiKey" type="password" placeholder="sk-..." autocomplete="off">
+                </label>
+                <label class="field">
+                    <span>模型</span>
+                    <input id="model" type="text" value="gpt-4o-mini" autocomplete="off">
+                </label>
+                <div class="field-row">
+                    <label class="field">
+                        <span>Temperature</span>
+                        <input id="temperature" type="number" min="0" max="2" step="0.1" value="0.7">
+                    </label>
+                    <label class="field">
+                        <span>Max Tokens</span>
+                        <input id="maxTokens" type="number" min="64" max="4096" step="64" value="512">
+                    </label>
+                </div>
+                <label class="field">
+                    <span>回复风格</span>
+                    <input id="persona" type="text" placeholder="自然、简洁、中文日常聊天" autocomplete="off">
+                </label>
+                <label class="field">
+                    <span>额外要求</span>
+                    <textarea id="instructions" rows="3" placeholder="不要使用 Markdown，回复不超过 80 字"></textarea>
+                </label>
+                <button id="save" class="button primary wide" type="button">保存设置</button>
+                <p id="saveStatus" class="status" role="status" aria-live="polite"></p>
+            </section>
+        </main>
+    </div>
+
+    <script src="./app.js"></script>
+</body>
+</html>
+

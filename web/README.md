@@ -11,6 +11,18 @@
 
 想立刻上线而不等待 GitHub：打开 [Netlify Drop](https://app.netlify.com/drop)，把本文件夹直接拖进去即可。
 
+## 为什么点击“生成建议”会提示 Failed to fetch
+
+OpenAI 官方 API 不允许浏览器跨域直连，页面直接请求会触发 CORS，浏览器统一显示为 `Failed to fetch`。
+
+仓库已包含 `netlify/functions/chat.js`，这是一个 Netlify Function，会在服务端转发 OpenAI 请求，从而绕开浏览器 CORS。发布时请确认：
+
+- 使用 Git 导入 Netlify，而不是只部署静态文件。
+- `netlify.toml` 保留 `functions = "netlify/functions"`。
+- 设置页勾选“通过 Netlify Function 转发请求”。
+
+如果部署在非 Netlify 平台且没有该 Function，需要改用支持 CORS 的 OpenAI 兼容服务，或取消勾选并自行配置可用的代理。
+
 ## Shortcuts 自动化
 
 可以创建一个“快捷指令”：

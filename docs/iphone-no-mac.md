@@ -28,6 +28,18 @@ https://你的域名/index.html?text=<剪贴板>&auto=1
 
 仓库根目录的 `netlify.toml` 已把发布目录设置为 `web`，也配置了 service worker 和首页的缓存策略。
 
+### Failed to fetch 怎么处理
+
+这是浏览器 CORS 问题：OpenAI 官方 API 不允许网页直接跨域请求。仓库已带 `netlify/functions/chat.js`，用 Netlify Function 在服务端转发请求。
+
+修复后请确认：
+
+- Netlify 使用 Git 导入，而不是只拖静态文件。
+- 设置页“通过 Netlify Function 转发请求”保持勾选。
+- 保存设置后重新点“生成建议”。
+
+如果你用的是 Netlify Drop，请改回 Git 导入，因为 Function 需要随仓库一起部署。
+
 ## 方案二：纯快捷指令（不依赖本项目部署）
 
 即使完全不构建 App，也可以在“快捷指令”里手动搭一个 AI 回复器：

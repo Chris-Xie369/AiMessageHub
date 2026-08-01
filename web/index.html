@@ -83,6 +83,10 @@
                     <span>额外要求</span>
                     <textarea id="instructions" rows="3" placeholder="不要使用 Markdown，回复不超过 80 字"></textarea>
                 </label>
+                <label class="check-field">
+                    <input id="useProxy" type="checkbox" checked>
+                    <span>通过 Netlify Function 转发请求</span>
+                </label>
                 <button id="save" class="button primary wide" type="button">保存设置</button>
                 <p id="saveStatus" class="status" role="status" aria-live="polite"></p>
             </section>
@@ -92,4 +96,3 @@
     <script src="./app.js"></script>
 </body>
 </html>
-

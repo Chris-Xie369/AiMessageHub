@@ -8,6 +8,7 @@ const DEFAULTS = {
     maxTokens: 512,
     persona: "",
     instructions: "",
+    useProxy: true,
 };
 
 const STORAGE_KEY = "aimessagehub-web-v1";
@@ -29,6 +30,7 @@ const els = {
     maxTokens: document.getElementById("maxTokens"),
     persona: document.getElementById("persona"),
     instructions: document.getElementById("instructions"),
+    useProxy: document.getElementById("useProxy"),
     save: document.getElementById("save"),
     saveStatus: document.getElementById("saveStatus"),
 };
@@ -104,6 +106,7 @@ function collectSettings() {
         maxTokens: Number(els.maxTokens.value) || DEFAULTS.maxTokens,
         persona: els.persona.value.trim(),
         instructions: els.instructions.value.trim(),
+        useProxy: els.useProxy.checked,
     };
 }
 
@@ -115,6 +118,7 @@ function fillSettings() {
     els.maxTokens.value = settings.maxTokens;
     els.persona.value = settings.persona;
     els.instructions.value = settings.instructions;
+    els.useProxy.checked = settings.useProxy;
 }
 
 function saveSettings() {
@@ -160,24 +164,12 @@ async function generate() {
     setStatus("正在生成建议…");
     els.generate.disabled = true;
     try {
-        const response = await fetch(settings.baseUrl.replace(/\/+$/, "") + "/chat/completions", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + settings.apiKey,
-            },
-            body: JSON.stringify({
-                model: settings.model,
-                temperature: settings.temperature,
-                max_tokens: settings.maxTokens,
-                messages: buildMessages(messageText),
-            }),
+        const body = await requestChatCompletion({
+            model: settings.model,
+            temperature: settings.temperature,
+            max_tokens: settings.maxTokens,
+            messages: buildMessages(messageText),
         });
-        const body = await response.json();
-        if (!response.ok) {
-            const detail = body && body.error && body.error.message ? body.error.message : "请求失败";
-            throw new Error(`HTTP ${response.status}: ${detail}`);
-        }
         const choices = Array.isArray(body.choices) ? body.choices : [];
         const raw = choices
             .map((choice) => choice && choice.message && choice.message.content)
@@ -193,6 +185,69 @@ async function generate() {
     } finally {
         els.generate.disabled = false;
     }
+}
+
+async function requestChatCompletion(payload) {
+    if (settings.useProxy) {
+        try {
+            return await proxyChatCompletion(payload);
+        } catch (error) {
+            if (String(error.message).includes("PROXY_NOT_FOUND")) {
+                return directChatCompletion(payload);
+            }
+            throw error;
+        }
+    }
+    return directChatCompletion(payload);
+}
+
+async function proxyChatCompletion(payload) {
+    const proxyUrl = new URL("/.netlify/functions/chat", window.location.origin).toString();
+    const response = await fetch(proxyUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            baseUrl: settings.baseUrl,
+            apiKey: settings.apiKey,
+            payload,
+        }),
+    });
+    const text = await response.text();
+    let body = {};
+    try {
+        body = text ? JSON.parse(text) : {};
+    } catch {
+        body = {};
+    }
+    if (response.status === 404) {
+        throw new Error("PROXY_NOT_FOUND");
+    }
+    if (!response.ok) {
+        const detail = body && body.error && body.error.message
+            ? body.error.message
+            : text.slice(0, 200);
+        throw new Error(`HTTP ${response.status}: ${detail}`);
+    }
+    return body;
+}
+
+async function directChatCompletion(payload) {
+    const response = await fetch(settings.baseUrl.replace(/\/+$/, "") + "/chat/completions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + settings.apiKey,
+            },
+            body: JSON.stringify(payload),
+        });
+        const body = await response.json();
+        if (!response.ok) {
+            const detail = body && body.error && body.error.message ? body.error.message : "请求失败";
+            throw new Error(`HTTP ${response.status}: ${detail}`);
+        }
+        return body;
 }
 
 function parseVariants(raw) {
@@ -281,4 +336,3 @@ if ("serviceWorker" in navigator) {
 fillSettings();
 bindEvents();
 handleUrlParams();
-

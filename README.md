@@ -41,6 +41,8 @@ Web/PWA 还支持本地历史对话：按联系人保存最近 20 条消息，�
 
 开发流程使用 TDD：先审查，再写失败测试，做最小修复，最后运行完整自测；具体命令见 [docs/tdd.md](docs/tdd.md)。
 
+自动获取消息的平台边界：Android 可通过通知监听和无障碍服务自动读取微信、QQ、Soul、小红书；iPhone 受系统沙盒限制无法自动读取这些 App 的聊天内容，只能使用剪贴板、分享、键盘和快捷指令流程。详细对比见 [docs/platform-matrix.md](docs/platform-matrix.md)。
+
 ## iOS 快速开始
 
 使用 [XcodeGen](https://github.com/yonaskolb/XcodeGen) 生成工程：
